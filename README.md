@@ -2,27 +2,44 @@
 
 Terraform-based infrastructure for serverless workloads on Google Cloud Platform. Implements private networking, secret management, and enterprise security controls across multiple environments.
 
+## Structure
+```
+terraform/
+ - modules/          # Reusable components
+ - environments/     # Dev and prod configs
+ - backend-setup/    # State bucket setup
+```
+
+## Setup
+```bash
+# 1. Configure GCP project
+gcloud config set project YOUR_PROJECT_ID
+
+# 2. Enable APIs
+./scripts/enable-apis.sh
+
+# 3. Create state backend
+./scripts/create-terraform-backend.sh dev
+
+# 4. Deploy
+cd terraform/environments/dev
+terraform init
+terraform plan
+terraform apply
+```
+
 ## Architecture
 
-- **VPC**: Custom network with private subnets and Cloud NAT
-- **Cloud Functions**: Gen 2 functions with VPC connectivity
-- **Secret Manager**: Centralized secret storage with IAM controls
-- **Cloud Storage**: Private bucket with lifecycle policies
-- **Load Balancer**: HTTPS Application LB with serverless backend
-- **Security**: Zero public exposure except LB endpoint, least-privilege IAM
+- VPC with private subnets
+- Cloud Functions Gen2 with VPC connector
+- Secret Manager for credentials
+- Cloud Storage with private access
+- Application Load Balancer
+- Service accounts with minimal IAM permissions
 
-## Prerequisites
+## Environments
 
-- GCP Project with billing enabled
-- Terraform >= 1.9.0
-- gcloud CLI authenticated
-- Required GCP APIs enabled`
+- **dev**: Development environment
+- **prod**: Production environment (manual approval required)
 
-## Security Controls
-
-- Private VPC with no default internet access
-- Cloud NAT for controlled egress
-- Service accounts with least-privilege IAM
-- Secret Manager for credential storage
-- VPC Service Controls
-- Cloud Armor
+See `docs/` for detailed documentation.
