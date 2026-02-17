@@ -43,6 +43,8 @@ resource "google_cloudfunctions2_function" "function" {
     environment_variables = {
       SECRET_ID   = var.secret_id
       BUCKET_NAME = var.bucket_name
+      GCP_PROJECT_ID = var.project_id
+      ENVIRONMENT    = var.environment
     }
   }
 
