@@ -46,17 +46,16 @@ resource "google_service_account_iam_member" "workload_identity" {
 
 locals {
   terraform_roles = [
-    "roles/compute.networkAdmin",        
-    "roles/compute.securityAdmin",       
-    "roles/vpcaccess.admin",          
-    "roles/cloudfunctions.admin",     
-    "roles/run.admin",                
-    "roles/storage.admin",             
-    "roles/secretmanager.admin",     
-    "roles/iam.serviceAccountAdmin",     
-    "roles/iam.serviceAccountUser",   
-    "roles/resourcemanager.projectIamAdmin",  
-    "roles/compute.loadBalancerAdmin",  
+    "roles/compute.networkAdmin",
+    "roles/compute.securityAdmin",
+    "roles/vpcaccess.admin",
+    "roles/cloudfunctions.admin",
+    "roles/run.admin",
+    "roles/storage.admin",
+    "roles/secretmanager.admin",
+    "roles/iam.serviceAccountAdmin",
+    "roles/iam.serviceAccountUser",
+    "roles/compute.loadBalancerAdmin",
   ]
 }
 

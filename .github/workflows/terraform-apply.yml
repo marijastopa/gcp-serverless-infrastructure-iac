@@ -1,0 +1,95 @@
+name: Terraform Apply
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+
+concurrency:
+  group: terraform-apply-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply-dev:
+    name: Apply Dev
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v3.0.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_DEV }}
+          service_account: ${{ secrets.GCP_TERRAFORM_SA_DEV }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3.0.1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+
+      - name: Terraform Init
+        working-directory: terraform/environments/dev
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform/environments/dev
+        run: terraform plan -no-color -out=tfplan
+        env:
+          TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID_DEV }}
+          TF_VAR_github_repository: ${{ github.repository }}
+
+      - name: Terraform Apply
+        working-directory: terraform/environments/dev
+        run: terraform apply -auto-approve tfplan
+
+  apply-prod:
+    name: Apply Prod
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    needs: apply-dev
+    permissions:
+      contents: read
+      id-token: write
+    environment: prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v3.0.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_PROD }}
+          service_account: ${{ secrets.GCP_TERRAFORM_SA_PROD }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3.0.1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+
+      - name: Terraform Init
+        working-directory: terraform/environments/prod
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform/environments/prod
+        run: terraform plan -no-color -out=tfplan
+        env:
+          TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID_PROD }}
+          TF_VAR_github_repository: ${{ github.repository }}
+          TF_VAR_domain: ${{ secrets.PROD_DOMAIN }}
+
+      - name: Terraform Apply
+        working-directory: terraform/environments/prod
+        run: terraform apply -auto-approve tfplan
