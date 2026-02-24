@@ -1,15 +1,5 @@
 # Configuration for Terraform state buckets.
 # This is the ONLY part of infrastructure created manually.
-#
-# Prerequisites:
-#   gcloud auth application-default login
-#   gcloud config set project PROJECT_ID
-#
-# Usage:
-#   cd terraform/backend-setup
-#   terraform init
-#   terraform apply -var="project_id=PROJECT_ID" -var="environment=dev"
-#   terraform apply -var="project_id=PROJECT_ID" -var="environment=prod"
 
 terraform {
   required_version = ">= 1.9.0"
