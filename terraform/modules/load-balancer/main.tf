@@ -28,9 +28,7 @@ resource "google_compute_backend_service" "function_backend" {
   project = var.project_id
   name    = "${var.lb_name}-backend"
 
-  protocol    = "HTTP"
-  port_name   = "http"
-  timeout_sec = 60
+  protocol = "HTTP"
 
   backend {
     group = google_compute_region_network_endpoint_group.function_neg.id
