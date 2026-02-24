@@ -27,3 +27,13 @@ output "vpc_name" {
   description = "VPC network name"
   value       = module.networking.vpc_name
 }
+
+output "terraform_sa_email" {
+  description = "Terraform SA email for GitHub Actions"
+  value       = module.service_accounts.terraform_sa_email
+}
+
+output "workload_identity_provider" {
+  description = "Workload Identity Provider for GitHub Actions"
+  value       = module.service_accounts.workload_identity_provider
+}
