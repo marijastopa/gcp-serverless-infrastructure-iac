@@ -58,10 +58,3 @@ resource "google_storage_bucket" "terraform_state" {
     }
   }
 }
-
-# Grant Terraform SA access to state bucket
-resource "google_storage_bucket_iam_member" "terraform_state_admin" {
-  bucket = google_storage_bucket.terraform_state.name
-  role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${var.terraform_sa_email}"
-}

@@ -19,7 +19,3 @@ variable "region" {
   default     = "europe-west1"
 }
 
-variable "terraform_sa_email" {
-  description = "Terraform service account email to grant state access"
-  type        = string
-}
