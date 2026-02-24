@@ -36,8 +36,6 @@ resource "google_compute_backend_service" "function_backend" {
     group = google_compute_region_network_endpoint_group.function_neg.id
   }
 
-  health_checks = [google_compute_health_check.function_health.id]
-
   security_policy = var.enable_cloud_armor ? google_compute_security_policy.policy[0].id : null
 
   log_config {
