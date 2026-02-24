@@ -64,6 +64,7 @@ module "cloud_function" {
 
   project_id              = var.project_id
   region                  = var.region
+  environment             = var.environment
   function_name           = "${local.name_prefix}-function"
   service_account_email   = module.service_accounts.function_sa_email
   vpc_connector           = module.networking.connector_id
