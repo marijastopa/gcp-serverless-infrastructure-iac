@@ -38,16 +38,11 @@ resource "google_compute_backend_service" "function_backend" {
 
   health_checks = [google_compute_health_check.function_health.id]
 
+  security_policy = var.enable_cloud_armor ? google_compute_security_policy.policy[0].id : null
+
   log_config {
     enable      = true
     sample_rate = 1.0
-  }
-
-  dynamic "security_settings" {
-    for_each = var.enable_cloud_armor ? [1] : []
-    content {
-      security_policy = google_compute_security_policy.policy[0].id
-    }
   }
 }
 
