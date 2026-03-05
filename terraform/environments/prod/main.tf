@@ -91,7 +91,7 @@ module "load_balancer" {
   function_url          = module.cloud_function.function_url
   function_service_name = module.cloud_function.function_name
 
-  enable_https       = true
-  domain             = var.domain
-  enable_cloud_armor = true
+  enable_https       = false
+  domain             = ""
+  enable_cloud_armor = false
 }
