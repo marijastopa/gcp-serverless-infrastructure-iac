@@ -1,9 +1,5 @@
-from flask import Flask
-app = Flask(__name__)
+import functions_framework
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    return 'Hello from Flask!'
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+@functions_framework.http
+def main(request):
+    return 'Hello World'
