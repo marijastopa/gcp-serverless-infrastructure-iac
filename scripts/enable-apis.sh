@@ -20,6 +20,7 @@ APIS=(
     "servicenetworking.googleapis.com"
     "cloudresourcemanager.googleapis.com"
     "iam.googleapis.com"
+    "gcloud services enable cloudresourcemanager.googleapis.com"
 )
 
 for api in "${APIS[@]}"; do
