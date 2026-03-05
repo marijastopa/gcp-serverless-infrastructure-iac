@@ -9,21 +9,6 @@ resource "google_compute_region_network_endpoint_group" "function_neg" {
   }
 }
 
-resource "google_compute_health_check" "function_health" {
-  project = var.project_id
-  name    = "${var.lb_name}-health-check"
-
-  timeout_sec         = 5
-  check_interval_sec  = 10
-  healthy_threshold   = 2
-  unhealthy_threshold = 3
-
-  http_health_check {
-    port         = 80
-    request_path = "/"
-  }
-}
-
 resource "google_compute_backend_service" "function_backend" {
   project = var.project_id
   name    = "${var.lb_name}-backend"
