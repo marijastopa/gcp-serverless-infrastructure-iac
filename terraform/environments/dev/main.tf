@@ -93,3 +93,5 @@ module "load_balancer" {
   enable_https      = false
   enable_cloud_armor = false
 }
+
+# CI/CD test
