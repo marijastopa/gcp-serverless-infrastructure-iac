@@ -11,11 +11,11 @@ locals {
 module "networking" {
   source = "../../modules/networking"
 
-  project_id   = var.project_id
-  region       = var.region
-  environment  = var.environment
-  vpc_name     = "${local.name_prefix}-vpc"
-  subnet_cidr  = "10.0.1.0/24"
+  project_id     = var.project_id
+  region         = var.region
+  environment    = var.environment
+  vpc_name       = "${local.name_prefix}-vpc"
+  subnet_cidr    = "10.0.1.0/24"
   connector_cidr = "10.0.2.0/28"
 
   nat_log_filter          = "ERRORS_ONLY"
@@ -62,16 +62,16 @@ module "deployment_storage" {
 module "cloud_function" {
   source = "../../modules/cloud-function"
 
-  project_id              = var.project_id
-  region                  = var.region
-  environment             = var.environment
-  function_name           = "${local.name_prefix}-function"
-  service_account_email   = module.service_accounts.function_sa_email
-  vpc_connector           = module.networking.connector_id
-  secret_id               = module.secret_manager.secret_id
-  bucket_name             = module.app_storage.bucket_name
-  deployment_bucket_name  = module.deployment_storage.bucket_name
-  source_dir              = "${path.root}/../../../function/src"
+  project_id             = var.project_id
+  region                 = var.region
+  environment            = var.environment
+  function_name          = "${local.name_prefix}-function"
+  service_account_email  = module.service_accounts.function_sa_email
+  vpc_connector          = module.networking.connector_id
+  secret_id              = module.secret_manager.secret_id
+  bucket_name            = module.app_storage.bucket_name
+  deployment_bucket_name = module.deployment_storage.bucket_name
+  source_dir             = "${path.root}/../../../function/src"
 
   memory_mb       = 256
   timeout_seconds = 60
@@ -90,7 +90,7 @@ module "load_balancer" {
   function_url          = module.cloud_function.function_url
   function_service_name = module.cloud_function.function_name
 
-  enable_https      = false
+  enable_https       = false
   enable_cloud_armor = false
 }
 

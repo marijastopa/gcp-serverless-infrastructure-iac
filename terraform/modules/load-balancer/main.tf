@@ -59,10 +59,10 @@ resource "google_compute_managed_ssl_certificate" "cert" {
 }
 
 resource "google_compute_target_https_proxy" "https_proxy" {
-  count           = var.enable_https ? 1 : 0
-  project         = var.project_id
-  name            = "${var.lb_name}-https-proxy"
-  url_map         = google_compute_url_map.url_map.id
+  count            = var.enable_https ? 1 : 0
+  project          = var.project_id
+  name             = "${var.lb_name}-https-proxy"
+  url_map          = google_compute_url_map.url_map.id
   ssl_certificates = [google_compute_managed_ssl_certificate.cert[0].id]
 }
 
