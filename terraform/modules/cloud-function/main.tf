@@ -38,7 +38,7 @@ resource "google_cloudfunctions2_function" "function" {
 
     vpc_connector                 = var.vpc_connector
     vpc_connector_egress_settings = "PRIVATE_RANGES_ONLY"
-    ingress_settings              = "ALLOW_INTERNAL_ONLY"
+    ingress_settings              = "ALLOW_INTERNAL_AND_GCLB"
 
     environment_variables = {
       SECRET_ID   = var.secret_id
