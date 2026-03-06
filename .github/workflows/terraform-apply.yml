@@ -50,7 +50,7 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform/environments/dev
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply tfplan
 
   apply-prod:
     name: Apply Prod
@@ -92,4 +92,4 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform/environments/prod
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply tfplan
