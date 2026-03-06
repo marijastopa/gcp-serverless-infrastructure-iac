@@ -16,7 +16,7 @@ resource "google_cloudfunctions2_function" "function" {
   location = var.region
 
   labels = var.labels
-  
+
   build_config {
     runtime     = var.runtime
     entry_point = var.entry_point
@@ -41,8 +41,8 @@ resource "google_cloudfunctions2_function" "function" {
     ingress_settings              = "ALLOW_INTERNAL_AND_GCLB"
 
     environment_variables = {
-      SECRET_ID   = var.secret_id
-      BUCKET_NAME = var.bucket_name
+      SECRET_ID      = var.secret_id
+      BUCKET_NAME    = var.bucket_name
       GCP_PROJECT_ID = var.project_id
       ENVIRONMENT    = var.environment
     }
