@@ -14,7 +14,7 @@ resource "google_service_account" "terraform" {
 
 resource "google_iam_workload_identity_pool" "github" {
   project                   = var.project_id
-  workload_identity_pool_id = "${var.environment}-github-pool"
+  workload_identity_pool_id = "${var.environment}-github-pool-v2"
   display_name              = "GitHub Actions Pool - ${var.environment}"
   description               = "Identity pool for GitHub Actions deployments"
 }
@@ -22,7 +22,7 @@ resource "google_iam_workload_identity_pool" "github" {
 resource "google_iam_workload_identity_pool_provider" "github" {
   project                            = var.project_id
   workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
-  workload_identity_pool_provider_id = "${var.environment}-github-provider"
+  workload_identity_pool_provider_id = "${var.environment}-github-provider-v2"
   display_name                       = "GitHub Actions Provider - ${var.environment}"
 
   attribute_mapping = {
