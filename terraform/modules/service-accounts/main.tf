@@ -56,7 +56,6 @@ locals {
     "roles/iam.serviceAccountAdmin",
     "roles/iam.serviceAccountUser",
     "roles/compute.loadBalancerAdmin",
-    "roles/iam.workloadIdentityPoolAdmin",
   ]
 }
 
