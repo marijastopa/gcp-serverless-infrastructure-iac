@@ -12,10 +12,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    name: Detect Changed Environments
+    runs-on: ubuntu-22.04
+    outputs:
+      dev_changed: ${{ steps.filter.outputs.dev }}
+      prod_changed: ${{ steps.filter.outputs.prod }}
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            dev:
+              - 'terraform/environments/dev/**'
+              - 'terraform/modules/**'
+            prod:
+              - 'terraform/environments/prod/**'
+
   plan-dev:
     name: Plan Dev
     runs-on: ubuntu-22.04
     timeout-minutes: 30
+    needs: detect-changes
+    if: needs.detect-changes.outputs.dev_changed == 'true'
     permissions:
       contents: read
       id-token: write
@@ -91,7 +111,8 @@ jobs:
     name: Plan Prod
     runs-on: ubuntu-22.04
     timeout-minutes: 30
-    needs: plan-dev
+    needs: detect-changes
+    if: needs.detect-changes.outputs.prod_changed == 'true'
     permissions:
       contents: read
       id-token: write
