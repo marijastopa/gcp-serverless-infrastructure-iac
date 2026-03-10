@@ -1,152 +1,85 @@
-# GCP Serverless Infrastructure - IaC
+# GCP Serverless Infrastructure
 
 Terraform-based infrastructure for serverless workloads on Google Cloud Platform. Implements private networking, secret management, and enterprise security controls across multiple environments.
 
-## Structure
-```
-terraform/
- - modules/          # Reusable components
- - environments/     # Dev and prod configs
- - backend-setup/    # State bucket setup
-```
+## What's deployed
 
-## Environments
+- Cloud Function (Gen2) behind a Load Balancer
+- Private VPC network with firewall rules
+- Secret Manager for configuration
+- Cloud Storage for files
+- CI/CD via GitHub Actions
 
-- **dev**: Development environment
-- **prod**: Production environment (manual approval required)
+Public internet can only reach the Load Balancer. Everything else is private.
 
-## Architecture
+## Quick setup
 
-- **Cloud Functions Gen2** - Serverless compute
-- **VPC** - Private networking with zero-trust firewall rules
-- **Application Load Balancer** - Public endpoint (only public resource)
-- **Secret Manager** - Secure secret storage
-- **Cloud Storage** - File storage
-- **Service Accounts** - Least-privilege IAM
-- **Workload Identity Federation** - Keyless CI/CD authentication
-
-All resources except the Load Balancer are deployed in a private network with IAM-based access control.
-
-## Prerequisites
-
-- GCP project with billing enabled
-- `gcloud` CLI configured
-- Terraform >= 1.9.0
-- GitHub repository for CI/CD
-
-## Quick Start
-
-### 1. Enable APIs
+**1. Enable APIs**
 ```bash
 ./scripts/enable-apis.sh
 ```
 
-### 2. Create Terraform State Buckets
+**2. Create state buckets**
 ```bash
 cd terraform/backend-setup
 terraform init
-terraform apply \
-  -var="project_id=PROJECT_ID" \
-  -var="environment=dev"
+terraform apply -var="project_id=YOUR_PROJECT" -var="environment=dev"
+terraform apply -var="project_id=YOUR_PROJECT" -var="environment=prod"
 ```
 
-### 3. Configure Environment Variables
+**3. Deploy dev**
 ```bash
 cd terraform/environments/dev
-terraform.tfvars
-```
+# Edit project_id in terraform.tfvars
 
-### 4. Deploy Infrastructure
-```bash
 terraform init
-terraform plan
 terraform apply
-```
 
-### 5. Add Secret Value
-```bash
-echo -n "your-secret-value" > /tmp/secret.txt
-gcloud secrets versions add iac-dev-app-secret \
-  --data-file=/tmp/secret.txt \
-  --project=PROJECT_ID
-rm /tmp/secret.txt
-```
-
-### 6. Add IAM Binding (required for LB access)
-```bash
+# Allow public access
 gcloud run services add-iam-policy-binding iac-dev-function \
-  --region=europe-west1 \
-  --member="allUsers" \
-  --role="roles/run.invoker" \
-  --project=PROJECT_ID
+  --region=europe-west1 --member="allUsers" --role="roles/run.invoker"
+
+# Test
+curl http://$(terraform output -raw load_balancer_ip)
 ```
 
-### 7. Test Deployment
+## How CI/CD works
+
+**Dev:** Merge to main → automatic deploy  
+**Prod:** Create git tag → manual approval → deploy
 ```bash
-# Get Load Balancer IP from outputs
-terraform output load_balancer_url
-
-# Test function
-curl http://LOAD_BALANCER_IP
+# Deploy to prod
+git tag -a v1.0.0 -m "First release"
+git push origin v1.0.0
+# Go to GitHub Actions, review plan, approve
 ```
 
-Expected response:
-```json
-{
-  "status": "success",
-  "secret_access_verified": true,
-  "secret_id": "iac-dev-app-secret",
-  "bucket": "PROJECT_ID-app-data-dev",
-  "files_count": 0,
-  "files": []
-}
-```
+See [docs/deployment.md](docs/deployment.md) for rollback procedures.
 
-## Security Features
+## What the function does
 
-- **Zero-trust networking** - Deny-all firewall rules with explicit allows
-- **Private networking** - All resources in VPC except Load Balancer
-- **Least-privilege IAM** - Function SA has access only to required resources
-- **No secrets in code** - Secrets in Secret Manager, not Terraform state
-- **Workload Identity** - No service account keys in CI/CD
-- **Ingress restrictions** - Function accepts only LB + internal traffic
+- Retrieves a value from Secret Manager
+- Lists files in Cloud Storage bucket
+- Returns JSON response with both
 
-## CI/CD
+## Security setup
 
-GitHub Actions workflows:
-- `terraform-plan.yml` - Plan on PR
-- `terraform-apply.yml` - Apply on merge to main
-- `deploy-secrets.yml` - Secret injection
+- Function runs in private VPC
+- Zero-trust firewall (deny all, explicit allows)
+- Least-privilege IAM
+- Workload Identity for CI/CD (no service account keys)
+- Daily drift detection to catch manual changes
 
-## Verification
+## Common issues
 
-### Infrastructure Setup
-```bash
-# Check VPC
-gcloud compute networks describe iac-dev-vpc --project=PROJECT_ID
+**403 error:** Missing IAM binding. Run the `gcloud run services add-iam-policy-binding` command above.
 
-# Check firewall rules (should deny all by default)
-gcloud compute firewall-rules list --project=PROJECT_ID
+**Drift detected:** Check GitHub Issues. Either import changes to Terraform or revert them manually.
 
-# Check function is private
-gcloud run services describe iac-dev-function \
-  --region=europe-west1 \
-  --format="value(spec.template.spec.serviceAccountName,spec.template.spec.containers[0].env)"
-```
+**Need rollback:** `./scripts/rollback.sh prod v1.0.0`
 
-### Function Verification
+## Requirements
 
-The function verifies connectivity to:
-- **Secret Manager** - Retrieves secret value (logged in dev, not in response)
-- **Cloud Storage** - Lists files in bucket
-
-## Cleanup
-```bash
-cd terraform/environments/dev
-terraform destroy
-```
-
-## License
-
-MIT
-
+- GCP project with billing
+- Terraform 1.9.0+
+- gcloud CLI
