@@ -16,7 +16,7 @@ Public internet can only reach the Load Balancer. Everything else is private.
 
 **1. Enable APIs**
 ```bash
-./scripts/create-state-buckets.sh
+./scripts/enable-apis.sh
 ```
 
 **2. Create state buckets**

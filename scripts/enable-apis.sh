@@ -29,4 +29,3 @@ for api in "${APIS[@]}"; do
 done
 
 echo "Done"
-echo "Next: ./scripts/create-terraform-backend.sh dev"
